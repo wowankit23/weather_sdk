@@ -1,47 +1,92 @@
-# weather_sdk
+## Table of content
+* Done items
+* Architecture & Techniques
+* Project structure
+* Main libraries
+* Setup project
+* Requisites
 
+## Done items
+Features:
+* The application can retrieve the weather information from the OpenWeatherMaps API.
+* The application allows users to input the searching term.
+* The application can proceed searching with a condition of the search term length must be from 3 characters or above.
+* The application can render the searched results as a list of weather items.
+* The application supports the caching mechanism to prevent the app from generating a bunch of API requests.
+* The application can manage the caching mechanism & lifecycle.
+* The application can handle failures.
 
-Weather App
+Technical requirements:
+* Kotlin (100%)
+* App's architecture: MVVM
+* Apply LiveData mechanism
+* UI looks like the attached image. Plus:
+    * Input text area for forecast time range.
+    * Error validation of Search term and forecast time range.
+* Unit Tests
+* Acceptance Tests
+* Exception handling
+* Caching handling
+* Scaling: change the size of items on the device's screen
+* README (this file)
 
-This is a weather app, in which the weather according to the location is shown.
+## Architecture & Techniques
+* Architecture: Clean Architecture
+* Main principles: SOLID principles
+* Pattern: MVVM, Repository
+* Important techniques and libraries: ReactiveX (with RxJava), Dependency Injection (with Dagger 2), Networking with Retrofit, Caching with Room DB.
 
-A separate weather sdk has been used in this.
-Got the location in this
-The weather is shown according to the location
-this app is very useful for user, they can seen own weather as per own location.
-this app have showing Current Date Wind Speed and Tempreture with CELSIUS and also in FAHRENHEIT
-user can check current date temprature and also next seven days temprature with Wind Speed.
-Templated Files
+## Project structure
+Main packages:
+* `domain`: defines the domain layer that contains the business logic of the app, including:
+    * Entity: the main entities of the app.
+    * Use-case: the use-cases that can happen within the app (for example, get weather)
+    * Repository interface: used by the use-cases to access the data
 
-This list contains all templated files that will be overwitten by certain any tasks. None of this files should be committed to the repository.
+* `presentation`: defines the presentation layer. This layer communicates with the `domain` layer to modify or retrieve data and transform them into displayable data. This package includes:
+    * View Model
+    * Activity
 
-AndroidManifest.xml.template
+* `view`: defines the view layer, including
+    * UI model: the displayable data that can be set directly into the view components. UI models are created from the entities by the `presentation` layer.
+    * Adapter
 
+* `datasource`: defines the implementation of the repository and its gateways.
+    * Repository implementation
+    * Local data source: the local gateway of the repository. This gateway uses the local database to store and retrieve data.
+    * Remote data source: the remote gateway of the repository. This gateway retrieves data from the server via API calls.
 
-The weather sdk has been added to it separately. In this api is implemented, it sends the data of weather according to latitude, longitude and api_key.
+* `di`: setups the dependency injection of the app using Dagger 2
 
-How to implemented weather sdk
+Other packages:
+* `threading`: defines the RxJava schedulers provider
+* `utils`: defines app constants, extension functions, and Retrofit API service generator.
 
-there are some steps which are define below.
+## Main libraries
+* ViewModel
+* Retrofit
+* Hilt
+* Android architecture components
 
-Click On File -> New -> import module
-Import Module from source is open
-sourece directory - > browse the sdk -> Click Ok
-include ':SDK'
-also check in settings.gradle file, is sdk add or not if add then it's perfect.
-PROGRAMMING LANGUAGES
+## Setup project
+To run the app
+```
+Clone or download the repository from Github.
+Open project from MyWeather folder with Android Studio.
+Sync project with Gradle files.
+Clean and rebuild project.
+Run the app on your device or emulator.
+```
 
-Kotlin
-Android
-TECHNOLOGIES USED
+To run the unit tests
+```
+Sync project with Gradle files.
+Clean and rebuild project.
+Right click on test package (com.phuong.myweather(test)).
+Choose "Run 'Tests in 'myweather''" to run all test cases.
+Choose "Run 'Tests in 'myweather'' with coverage" to run all test cases and see coverage report.
+```
 
-MVVM
-Retrofit
-Coroutine
-REPOSITORY / CODE MAINTENANCE
-
-Github.
-
-ENGINEERING TOOLS
-
-Android Studio
+## Requisites
+* This app requires Android 6.0 or newer
+* You must turn on your internet connection at least once to be able to load data from the server
