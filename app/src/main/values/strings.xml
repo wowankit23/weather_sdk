@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Weather</string>
+
+    <string name="weather_report">Weather Report</string>
+    <string name="wind_speed">\"Wind Speed \"</string>
+    <string name="temprature">\"Temperature \"</string>
+    <string name="cel_temp">\" Cel\"</string>
+    <string name="km">\" Km/h\"</string>
+    <string name="cel">\" Cel.\"</string>
+</resources>
