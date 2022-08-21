@@ -1,8 +1,8 @@
-package com.example.weatherreport.di
+package com.mobileprogramming.weather.di
 
-import com.example.weather.libraryModule
-import com.example.weatherreport.activity.splashScreen.WelcomeScreenViewModel
-import com.example.weatherreport.activity.splashScreen.weather.WeatherDetailViewModel
+import com.mobileprogramming.weather.activity.splashScreen.weather.WeatherDetailViewModel
+import com.mobileprogramming.weather.activity.splashScreen.weather.WelcomeScreenViewModel
+import com.mobileprogramming.weather_sdk.libraryModule
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 

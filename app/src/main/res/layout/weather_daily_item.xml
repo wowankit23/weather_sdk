@@ -8,7 +8,7 @@
     <data>
         <variable
             name="item"
-            type="com.mobileprogramming.weather_sdk.model.weatherModel.Daily" />
+            type="com.mobileprogramming.weather_sdk.model.Daily" />
 
         <import type="android.view.View" />
 

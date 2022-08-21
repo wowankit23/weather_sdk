@@ -5,14 +5,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.example.weatherreport.R
-import com.example.weatherreport.databinding.WeatherDailyItemBinding
-import com.example.weather.model.weatherModel.Daily
-import com.example.weather.utils.DateUtils.getDateFromTimeStamp
-import com.example.weather.utils.TemperatureUtils.convertTempCelsiusToFahrenheit
 import com.mobileprogramming.weather.R
 import com.mobileprogramming.weather.databinding.WeatherDailyItemBinding
 import com.mobileprogramming.weather_sdk.model.Daily
+import com.mobileprogramming.weather_sdk.utils.DateUtils.getDateFromTimeStamp
+import com.mobileprogramming.weather_sdk.utils.TemperatureUtils.convertTempCelsiusToFahrenheit
 
 class WeatherDailyReportAdapter(
     var context: Context,

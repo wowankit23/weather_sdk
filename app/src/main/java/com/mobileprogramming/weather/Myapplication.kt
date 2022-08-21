@@ -1,7 +1,7 @@
 package com.mobileprogramming.weather
 
 import android.app.Application
-import com.example.weatherreport.di.appModule
+import com.mobileprogramming.weather.di.appModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin

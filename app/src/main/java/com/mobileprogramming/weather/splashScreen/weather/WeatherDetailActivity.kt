@@ -12,6 +12,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.weather.data.Resource
 import com.example.weatherreport.adapter.WeatherDailyReportAdapter
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -20,6 +21,7 @@ import com.mobileprogramming.weather.activity.splashScreen.weather.WeatherDetail
 import com.mobileprogramming.weather.databinding.ActivityWeatherDetailBinding
 import com.mobileprogramming.weather_sdk.model.Daily
 import com.mobileprogramming.weather_sdk.model.WeatherResponse
+import com.mobileprogramming.weather_sdk.utils.TemperatureUtils.convertTempCelsiusToFahrenheit
 
 
 class WeatherDetailActivity : AppCompatActivity() {
@@ -28,7 +30,7 @@ class WeatherDetailActivity : AppCompatActivity() {
         private const val MY_PERMISSIONS_REQUEST_LOCATION = 99
     }
 
-    private val viewModel: WeatherDetailViewModel by viewModel()
+    private val viewModel: WeatherDetailViewModel = TODO()
     private lateinit var binding: ActivityWeatherDetailBinding
     private lateinit var weatherDailyReportAdapter: WeatherDailyReportAdapter
     private lateinit var linearLayoutManager: LinearLayoutManager
@@ -87,15 +89,15 @@ class WeatherDetailActivity : AppCompatActivity() {
 
         binding.tempAndSky.text =
             weatherResponse.current?.weather?.get(0)?.description
-        binding.windSpeed.text = getString(R.string.wind_speed) + weatherResponse.current?.windSpeed?.toString() + getString(
-           R.string.km
-        )
+        binding.windSpeed.text = "wind_speed" + weatherResponse.current?.windSpeed?.toString() + "km"
+
+
         if(isWeatherInFahrenheit) {
             binding.temperature.text =
-                getString(com.example.weather.R.string.temprature) + convertTempCelsiusToFahrenheit(weatherResponse.current?.temp.toString()) + "F'"
+                getString(R.string.temprature) + convertTempCelsiusToFahrenheit(weatherResponse.current?.temp.toString()) + "F'"
         }else {
             binding.temperature.text =
-                getString(com.example.weather.R.string.temprature) + weatherResponse.current?.temp?.toString() + getString(
+                getString(R.string.temprature) + weatherResponse.current?.temp?.toString() + getString(
                    R.string.cel
                 )
         }

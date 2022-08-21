@@ -5,9 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weather.data.Resource
+import com.mobileprogramming.weather.splashScreen.weather.WeatherDetailActivity
 import com.mobileprogramming.weather_sdk.model.WeatherResponse
 import com.mobileprogramming.weather_sdk.repository.WeatherRepository
 import kotlinx.coroutines.launch
+import kotlin.reflect.KProperty
 
 class WeatherDetailViewModel (private var weatherRepository: WeatherRepository) : ViewModel() {
 
@@ -21,4 +23,6 @@ class WeatherDetailViewModel (private var weatherRepository: WeatherRepository) 
     ) = viewModelScope.launch {
         _weatherResponse.value = weatherRepository!!.getWeatherInformation(latitude,longitude,"hourly,minutely","ae1c4977a943a50eaa7da25e6258d8b2","Metric","4")
     }
+
+
 }
