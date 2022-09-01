@@ -26,8 +26,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = "1.8"
+    }
+    buildFeatures{
+        dataBinding = true
     }
 }
 
@@ -58,9 +62,8 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0'
 
-
-    implementation project(':weather-sdk')
-    // implementation 'com.github.Rahulkumarp:Weather_Report:1.0.0'
+//Weather_Lib
+    implementation project(path: ':weatherlib')
     // Koin for Kotlin apps
     implementation "io.insert-koin:koin-android:3.1.6"
     implementation 'com.google.android.gms:play-services-location:19.0.1'
@@ -71,4 +74,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:1.10.19'
+
+
 }

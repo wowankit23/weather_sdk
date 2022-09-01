@@ -134,28 +134,6 @@
             </LinearLayout>
 
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:orientation="horizontal">
-
-
-                <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:src="@drawable/common_full_open_on_phone"
-                    />
-
-                <TextView
-                    android:id="@+id/temperature"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:layout_gravity="center"
-                    android:padding="10dp"
-                    android:textColor="@android:color/black"/>
-            </LinearLayout>
 
             <View
                 android:layout_width="match_parent"

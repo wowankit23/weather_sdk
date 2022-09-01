@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Weather.iml" filepath="$PROJECT_DIR$/.idea/modules/Weather.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Weather.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Weather.app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/weather-sdk/Weather.weather-sdk.iml" filepath="$PROJECT_DIR$/.idea/modules/weather-sdk/Weather.weather-sdk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/weatherlib/Weather.weatherlib.iml" filepath="$PROJECT_DIR$/.idea/modules/weatherlib/Weather.weatherlib.iml" />
     </modules>
   </component>
 </project>

@@ -1,198 +1,274 @@
 package com.mobileprogramming.weather.splashScreen.weather
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
+import android.os.Looper
+import android.util.Log
 import android.view.View
+import android.provider.Settings
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.location.LocationManagerCompat.isLocationEnabled
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.weather.data.Resource
-import com.example.weatherreport.adapter.WeatherDailyReportAdapter
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
 import com.mobileprogramming.weather.R
-import com.mobileprogramming.weather.activity.splashScreen.weather.WeatherDetailViewModel
+import com.mobileprogramming.weather.adapter.WeatherDailyReportAdapter
 import com.mobileprogramming.weather.databinding.ActivityWeatherDetailBinding
-import com.mobileprogramming.weather_sdk.model.Daily
-import com.mobileprogramming.weather_sdk.model.WeatherResponse
-import com.mobileprogramming.weather_sdk.utils.TemperatureUtils.convertTempCelsiusToFahrenheit
+import com.mobileprogramming.weatherlib.data.model.weather.currentmodels.WeatherResponse
+import com.mobileprogramming.weatherlib.data.model.weather.weekmodels.Daily
+import com.mobileprogramming.weatherlib.data.model.weather.weekmodels.WeatherWeekResponse
+import com.weatherlibrary.sdk.WeatherSDK
+import com.weatherlibrary.sdk.utils.Utils.convertTempCelsiusToFahrenheit
 
 
 class WeatherDetailActivity : AppCompatActivity() {
 
     companion object {
         private const val MY_PERMISSIONS_REQUEST_LOCATION = 99
+        private const val TAG = "WeatherDetailActivity"
     }
-
-    private val viewModel: WeatherDetailViewModel = TODO()
+    private var temp = WeatherSDK.TempUnit.FAHRENHEIT
+    var fusedLocationProviderClient: FusedLocationProviderClient? = null
+    private var latitude = 0.0
+    private var longitude = 0.0
+    private var exclude = "hourly,minutely"
+    private var cnt = 7
     private lateinit var binding: ActivityWeatherDetailBinding
     private lateinit var weatherDailyReportAdapter: WeatherDailyReportAdapter
     private lateinit var linearLayoutManager: LinearLayoutManager
-    private lateinit var dailyWeatherReport: ArrayList<Daily>
     private var isWeatherInFahrenheit = false
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var weatherResponse: WeatherResponse
+    private lateinit var weatherSDK: WeatherSDK
+    private lateinit var dailyWeatherReport: ArrayList<Daily>
 
+    var weatherResponse:WeatherResponse?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_weather_detail)
-        setContentView(binding.root)
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        binding.progressbar.visibility = View.VISIBLE
-        weatherResponse = WeatherResponse()
-        dailyWeatherReport = arrayListOf()
-        linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-
-        checkLocationPermission()
         init()
-        changeCelsiusToFahrenheit()
+        binding.progressbar.visibility = View.VISIBLE
+
+
 
     }
 
 
     private fun init() {
-        viewModel.weatherResponse.observe(this) {
-            when (it) {
-                is Resource.Success -> {
-                    weatherResponse = it.value
-                    updateView(weatherResponse)
+
+        weatherSDK = WeatherSDK.getInstance(getString(R.string.weather_key))
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_weather_detail)
+        setContentView(binding.root)
+        linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        getLastLocation()
+        dailyWeatherReport = arrayListOf()
+        changeCelsiusToFahrenheit()
+        updateDailyWeatherReport()
+    }
+
+
+        @SuppressLint("MissingPermission")
+         fun getLastLocation() { // check if permissions are given
+            if (checkPermissions()) {
+                // check if location is enabled
+                if (isLocationEnabled()) {
+                    if (ActivityCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+
+                        return
+                    }
+                    fusedLocationProviderClient?.lastLocation?.addOnCompleteListener { task ->
+                        val location = task.result
+                        if (location == null) {
+                            requestNewLocationData()
+                        } else {
+                            setLocation(location)
+                        }
+
+                    }
+                } else {
+                    goToLocationSettings()
+
                 }
-                is Resource.Failure -> {
-                    Toast.makeText(this, it.errorBody.toString(), Toast.LENGTH_SHORT).show()
-                    binding.progressbar.visibility = View.GONE
-                }
+            } else {
+                // if permissions aren't available,request for permissions
+                requestPermissions()
             }
-        }
+
+
     }
 
     private  fun changeCelsiusToFahrenheit() {
         binding.toggleCToF.setOnCheckedChangeListener { _, isChecked ->
+
+          var farhenite=  convertTempCelsiusToFahrenheit(binding.tempAndSky.text.toString())
+        binding.tempAndSky.text=farhenite
+
             isWeatherInFahrenheit = isChecked
 
-            updateView(weatherResponse)
         }
     }
 
-    private fun updateView(weatherResponse: WeatherResponse) {
 
 
-        dailyWeatherReport.clear()
-        dailyWeatherReport.addAll(weatherResponse.daily)
-        updateDailyWeatherReport()
-        binding.progressbar.visibility = View.GONE
-
-        binding.tempAndSky.text =
-            weatherResponse.current?.weather?.get(0)?.description
-        binding.windSpeed.text = "wind_speed" + weatherResponse.current?.windSpeed?.toString() + "km"
 
 
-        if(isWeatherInFahrenheit) {
-            binding.temperature.text =
-                getString(R.string.temprature) + convertTempCelsiusToFahrenheit(weatherResponse.current?.temp.toString()) + "F'"
-        }else {
-            binding.temperature.text =
-                getString(R.string.temprature) + weatherResponse.current?.temp?.toString() + getString(
-                   R.string.cel
-                )
-        }
+
+
+
+
+    private fun isLocationEnabled(): Boolean {
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+            LocationManager.NETWORK_PROVIDER
+        )
 
     }
 
+    @SuppressLint("MissingPermission")
+    private fun requestNewLocationData() {
+        // Initializing LocationRequest
+        // object with appropriate methods
+        val locationRequest = LocationRequest()
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        locationRequest.interval = 5
+        locationRequest.fastestInterval = 0
+        locationRequest.numUpdates = 1
 
+        // setting LocationRequest
+        // on FusedLocationClient
+
+        // setting LocationRequest
+        // on FusedLocationClient
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationProviderClient?.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+    }
+
+    private val locationCallback: LocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            val mLastLocation: Location = locationResult.lastLocation
+            setLocation(mLastLocation)
+        }
+    }
+    private fun setLocation(location: Location) {
+        latitude = location.latitude
+        longitude = location.longitude
+
+        getCurrentWeather()
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (checkPermissions()) {
+            getLastLocation()
+        }
+    }
+
+    private fun checkPermissions(): Boolean {
+        return ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == MY_PERMISSIONS_REQUEST_LOCATION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getLastLocation()
+            } else {
+                goToLocationSettings()
+            }
+        }
+    }
+
+    // method to request for permissions
+    private fun requestPermissions() {
+        ActivityCompat.requestPermissions(
+            this, arrayOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ), MY_PERMISSIONS_REQUEST_LOCATION
+        )
+    }
+
+    private fun goToLocationSettings() {
+        Toast.makeText(this, "Please turn on your location...", Toast.LENGTH_LONG)
+            .show()
+        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        startActivity(intent)
+    }
+
+    private fun getCurrentWeather() {
+
+        weatherSDK.getCurrentWeather(latitude, longitude, WeatherSDK.TempUnit.CELSIUS,
+            object : WeatherSDK.WeatherDataListener {
+                override fun onWeatherResponse(response: WeatherResponse) {
+                    binding.tempAndSky.text = response.main.temp.toString()
+                    binding.windSpeed.text= response.wind.speed.toString()+" km/Hr"
+                    getCurrentWeatherforWeek()
+//                    binding.content.tvWeatherData.text = "Weather of "+response.name+"is: \n\n"+response.toString()
+                }
+
+                override fun onErrorFetchingData(error: Throwable) {
+                }
+            })
+
+    }
+
+    private fun getCurrentWeatherforWeek() {
+        weatherSDK.getCurrentWeatherforWeek(latitude, longitude,
+            temp,
+            exclude,
+            cnt,
+            object : WeatherSDK.WeatherDataListenerforWeek {
+                override fun onWeatherResponseforWeek(response: WeatherWeekResponse) {
+                    dailyWeatherReport.clear()
+                    dailyWeatherReport.addAll(response.daily)
+                    updateDailyWeatherReport()
+                    binding.progressbar.visibility = View.GONE
+
+                }
+
+                override fun onErrorFetchingData(error: Throwable) {
+                    Toast.makeText(this@WeatherDetailActivity, error.message.toString(), Toast.LENGTH_SHORT).show()
+
+                }
+            })
+
+    }
     private fun updateDailyWeatherReport()
     {
         weatherDailyReportAdapter = WeatherDailyReportAdapter(this, dailyWeatherReport, isWeatherInFahrenheit)
         binding.dailyWeatherReport.layoutManager = linearLayoutManager
         binding.dailyWeatherReport.adapter = weatherDailyReportAdapter
-    }
-
-
-    private fun checkLocationPermission() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-            ) {
-                AlertDialog.Builder(this)
-                    .setTitle("Location Permission Needed")
-                    .setMessage("This app needs the Location permission, please accept to use location functionality")
-                    .setPositiveButton(
-                        "OK"
-                    ) { _, _ ->
-                        //Prompt the user once explanation has been shown
-                        requestLocationPermission()
-                    }
-                    .create()
-                    .show()
-            } else {
-                requestLocationPermission()
-            }
-        } else {
-            requestLocationPermission()
-        }
-    }
-
-    private fun requestLocationPermission() {
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
-            ),
-            MY_PERMISSIONS_REQUEST_LOCATION
-        )
-    }
-
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            MY_PERMISSIONS_REQUEST_LOCATION -> {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // location-related task you need to do.
-                    if (ContextCompat.checkSelfPermission(
-                            this,
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                        ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                            this,
-                            Manifest.permission.ACCESS_COARSE_LOCATION
-                        ) == PackageManager.PERMISSION_GRANTED
-                    ) {
-
-                        fusedLocationClient.lastLocation
-                            .addOnSuccessListener { location: Location? ->
-                                viewModel.getWeatherInfo(
-                                    location?.latitude.toString(),
-                                    location?.longitude.toString()
-                                )
-                            }
-                    }
-
-                } else {
-
-                    Toast.makeText(this, "permission denied! Please allow permission to see weather report", Toast.LENGTH_LONG).show()
-
-                }
-                return
-
-            }
-        }
     }
 
 }

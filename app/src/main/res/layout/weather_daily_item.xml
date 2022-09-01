@@ -8,7 +8,7 @@
     <data>
         <variable
             name="item"
-            type="com.mobileprogramming.weather_sdk.model.Daily" />
+            type="com.mobileprogramming.weatherlib.data.model.weather.weekmodels.Daily" />
 
         <import type="android.view.View" />
 
@@ -29,6 +29,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:contentPadding="5dp"
+            android:backgroundTint="@android:color/white"
             app:layout_constraintBottom_toBottomOf="parent"
            >
 

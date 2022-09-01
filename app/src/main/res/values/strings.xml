@@ -8,4 +8,5 @@
     <string name="cel_temp">\" Cel\"</string>
     <string name="km">\" Km/h\"</string>
     <string name="cel">\" Cel.\"</string>
+    <string name="weather_key">"ae1c4977a943a50eaa7da25e6258d8b2"</string>
 </resources>

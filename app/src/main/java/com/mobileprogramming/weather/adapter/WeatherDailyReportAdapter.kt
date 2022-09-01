@@ -1,4 +1,4 @@
-package com.example.weatherreport.adapter
+package com.mobileprogramming.weather.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,9 +7,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.mobileprogramming.weather.R
 import com.mobileprogramming.weather.databinding.WeatherDailyItemBinding
-import com.mobileprogramming.weather_sdk.model.Daily
-import com.mobileprogramming.weather_sdk.utils.DateUtils.getDateFromTimeStamp
-import com.mobileprogramming.weather_sdk.utils.TemperatureUtils.convertTempCelsiusToFahrenheit
+import com.mobileprogramming.weatherlib.data.model.weather.weekmodels.Daily
+import com.mobileprogramming.weatherlib.utils.DateUtils.getDateFromTimeStamp
+import com.weatherlibrary.sdk.utils.Utils.convertTempCelsiusToFahrenheit
 
 class WeatherDailyReportAdapter(
     var context: Context,
@@ -50,14 +50,10 @@ class WeatherDailyReportAdapter(
             binding.item = item
             binding.date.text = getDateFromTimeStamp(item.dt?.toLong())
             binding.tempAndSky.text = item.weather[0].description
-            binding.windSpeed.text = item.windSpeed?.toString() + "Km"
-            if(isWeatherInFahrenheit) {
-                binding.temperature.text = convertTempCelsiusToFahrenheit(item.temp?.day.toString())  + "F'"
-            }
-            else {
-                binding.temperature.text = item.temp?.day?.toString() + "Cel"
+            binding.windSpeed.text = item.wind_speed?.toString() + "Km"
+                binding.temperature.text = item.temp?.max.toString()  + "F'"
 
-            }
+
 
         }
 

@@ -12,10 +12,12 @@ class Myapplication : Application() {
     override fun onCreate() {
         super.onCreate()
         // Start Koin
-        startKoin{
+          startKoin{
             androidLogger(org.koin.core.logger.Level.ERROR)
             androidContext(this@Myapplication)
-            modules(appModule)
+              modules(
+                  appModule
+              )
         }
     }
 }
